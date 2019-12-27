@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  var FILL_ME_IN = 'Fill this value in';
+  var FILL_ME_IN = '1';
 
   var checkForNativeMethods = function(runUnderbarFunction) {
     it('should not use the native version of any underbar methods in its implementation', function() {
