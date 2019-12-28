@@ -242,12 +242,20 @@
   // Determine whether all of the elements match a truth test.
   _.every = function (collection, iterator) {
     // TIP: Try re-using reduce() here.
+    iterator = iterator || _.identity;
+    return !!_.reduce(collection, function(trueSoFar, value) {
+      return trueSoFar && iterator(value);
+    }, true );
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function (collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    iterator = iterator || _.identity;
+    return !!_.reduce(collection, function (trueSoFar, value) {
+      return trueSoFar || iterator(value);
+    }, false);
   };
 
 
@@ -270,11 +278,34 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function (obj) {
+    // loop through our arguments list
+    // source is our object
+    _.each(arguments, function(source) {
+      // loop through our object source
+      // pass in the value, key
+      _.each(source, function(value, key) {
+        // set the key value pairs to obj from extend
+        obj[key] = value;
+      });
+    });
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function (obj) {
+    _.each(arguments, function (source) {
+      // loop through our object source
+      // pass in the value, key
+      _.each(source, function (value, key) {
+        // if property and key does not exist
+        if (obj[key] === undefined) {
+          // then create property
+          obj[key] = value;
+        }
+      });
+    });
+    return obj;
   };
 
 
@@ -318,7 +349,23 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function (func) {
+
+    var results = {};
+
+    return function (arg) {
+      // convert arguments array like to strings so we can access them in if statement
+      var arg = JSON.stringify(arguments);
+
+      // we can access arguments here because it's stringified
+      if (results[arg] === undefined) {
+        // we can use apply here because arguments is stringified array
+        results[arg] = func.apply(this, arguments);
+      }
+     
+      return results[arg];
+    };
   };
+
 
   // Delays a function for the given number of milliseconds, and then calls
   // it with the arguments supplied.
@@ -326,7 +373,10 @@
   // The arguments for the original function are passed after the wait
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
-  _.delay = function (func, wait) {
+  _.delay = function (func, wait, ...args) {
+    setTimeout(function() {
+      func.apply(this, args);
+    }, wait);
   };
 
 
